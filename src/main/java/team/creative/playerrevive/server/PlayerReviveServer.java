@@ -72,6 +72,8 @@ public class PlayerReviveServer {
         NeoForge.EVENT_BUS.post(new PlayerRevivedEvent(player, revive));
         
         sendUpdatePacket(player);
+        
+        player.setForcedPose(null);
     }
     
     public static void kill(Player player) {
@@ -86,6 +88,7 @@ public class PlayerReviveServer {
         player.die(source);
         resetPlayer(player, revive);
         revive.revive(); // Done for compatibility reason for rare scenarios the player will not die
+        player.setForcedPose(null);
         
         PlayerRevive.CONFIG.sounds.death.play(player, SoundSource.PLAYERS);
         
