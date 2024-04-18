@@ -68,7 +68,7 @@ public class ReviveEventServer {
         }
     }
     
-    @SubscribeEvent
+    @SubscribeEvent(priority = EventPriority.HIGHEST)
     public void playerLeave(PlayerLoggedOutEvent event) {
         IBleeding revive = PlayerReviveServer.getBleeding(event.getEntity());
         if (revive.isBleeding())
