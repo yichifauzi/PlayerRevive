@@ -76,7 +76,7 @@ public class ReviveEventClient {
             event.player.setPose(Pose.SWIMMING);
     }
     
-    @SubscribeEvent
+    @SubscribeEvent(priority = EventPriority.HIGHEST)
     public void click(InteractionKeyMappingTriggered event) {
         Player player = mc.player;
         if (player != null) {
