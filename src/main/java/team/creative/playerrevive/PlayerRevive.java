@@ -41,7 +41,7 @@ public class PlayerRevive {
     public static final Logger LOGGER = LogManager.getLogger(PlayerRevive.MODID);
     public static final String MODID = "playerrevive";
     public static PlayerReviveConfig CONFIG;
-    public static final CreativeNetwork NETWORK = new CreativeNetwork("1.0", LOGGER, new ResourceLocation(PlayerRevive.MODID, "main"));
+    public static final CreativeNetwork NETWORK = new CreativeNetwork(2, LOGGER, new ResourceLocation(PlayerRevive.MODID, "main"));
     
     public static final ResourceLocation BLEEDING_NAME = new ResourceLocation(MODID, "bleeding");
     
