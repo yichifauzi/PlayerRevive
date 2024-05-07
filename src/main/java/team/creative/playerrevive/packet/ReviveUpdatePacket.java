@@ -19,7 +19,7 @@ public class ReviveUpdatePacket extends CreativePacket {
     public CompoundTag nbt;
     
     public ReviveUpdatePacket(Player player) {
-        this.nbt = PlayerReviveServer.getBleeding(player).serializeNBT();
+        this.nbt = PlayerReviveServer.getBleeding(player).serializeNBT(player.registryAccess());
         this.uuid = player.getUUID();
     }
     
@@ -33,7 +33,7 @@ public class ReviveUpdatePacket extends CreativePacket {
         Player member = Minecraft.getInstance().level.getPlayerByUUID(uuid);
         if (member != null) {
             IBleeding bleeding = PlayerReviveServer.getBleeding(member);
-            bleeding.deserializeNBT(nbt);
+            bleeding.deserializeNBT(player.registryAccess(), nbt);
             if (!bleeding.isBleeding())
                 member.setPose(Pose.STANDING);
         }

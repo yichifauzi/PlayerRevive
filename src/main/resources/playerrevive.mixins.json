@@ -6,13 +6,14 @@
     "server": [
     ],
     "mixins": [
-        "PlayerMixin",
         "CombatTrackerAccessor",
+        "PlayerMixin",
         "ServerPlayerMixin"
     ],
     "client": [
-        "MinecraftAccessor",
-        "LocalPlayerAccessor"
+        "GameRendererAccessor",
+        "LocalPlayerAccessor",
+        "MinecraftAccessor"
     ],
     "minVersion": "0.8"
 }

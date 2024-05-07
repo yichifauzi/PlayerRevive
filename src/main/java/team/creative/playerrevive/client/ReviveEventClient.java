@@ -19,11 +19,10 @@ import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 import net.neoforged.bus.api.EventPriority;
 import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.neoforge.client.event.ClientTickEvent;
 import net.neoforged.neoforge.client.event.InputEvent.InteractionKeyMappingTriggered;
-import net.neoforged.neoforge.client.event.RenderGuiOverlayEvent;
-import net.neoforged.neoforge.event.TickEvent.ClientTickEvent;
-import net.neoforged.neoforge.event.TickEvent.Phase;
-import net.neoforged.neoforge.event.TickEvent.PlayerTickEvent;
+import net.neoforged.neoforge.client.event.RenderGuiLayerEvent;
+import net.neoforged.neoforge.event.tick.PlayerTickEvent;
 import team.creative.playerrevive.PlayerRevive;
 import team.creative.playerrevive.api.IBleeding;
 import team.creative.playerrevive.mixin.LocalPlayerAccessor;
@@ -34,6 +33,7 @@ import team.creative.playerrevive.server.PlayerReviveServer;
 @OnlyIn(value = Dist.CLIENT)
 public class ReviveEventClient {
     
+    private static final ResourceLocation BLUR_SHADER = new ResourceLocation(PlayerRevive.MODID, "shaders/post/blobs2.json");
     public static Minecraft mc = Minecraft.getInstance();
     
     public static TensionSound sound;
@@ -69,12 +69,10 @@ public class ReviveEventClient {
     private int giveUpTimer = 0;
     
     @SubscribeEvent
-    public void playerTick(PlayerTickEvent event) {
-        if (event.phase == Phase.START)
-            return;
-        IBleeding revive = PlayerReviveServer.getBleeding(event.player);
+    public void playerTick(PlayerTickEvent.Post event) {
+        IBleeding revive = PlayerReviveServer.getBleeding(event.getEntity());
         if (revive.isBleeding())
-            event.player.setPose(Pose.SWIMMING);
+            event.getEntity().setPose(Pose.SWIMMING);
     }
     
     @SubscribeEvent(priority = EventPriority.HIGHEST)
@@ -88,29 +86,27 @@ public class ReviveEventClient {
     }
     
     @SubscribeEvent
-    public void clientTick(ClientTickEvent event) {
-        if (event.phase == Phase.END) {
-            Player player = mc.player;
-            if (player != null) {
-                IBleeding revive = PlayerReviveServer.getBleeding(player);
-                
-                if (revive.isBleeding())
-                    if (mc.options.keyAttack.isDown())
-                        if (giveUpTimer > PlayerRevive.CONFIG.bleeding.giveUpSeconds * 20) {
-                            PlayerRevive.NETWORK.sendToServer(new GiveUpPacket());
-                            giveUpTimer = 0;
-                        } else
-                            giveUpTimer++;
-                    else
+    public void clientTick(ClientTickEvent.Post event) {
+        Player player = mc.player;
+        if (player != null) {
+            IBleeding revive = PlayerReviveServer.getBleeding(player);
+            
+            if (revive.isBleeding())
+                if (mc.options.keyAttack.isDown())
+                    if (giveUpTimer > PlayerRevive.CONFIG.bleeding.giveUpSeconds * 20) {
+                        PlayerRevive.NETWORK.sendToServer(new GiveUpPacket());
                         giveUpTimer = 0;
+                    } else
+                        giveUpTimer++;
                 else
                     giveUpTimer = 0;
-            }
+            else
+                giveUpTimer = 0;
         }
     }
     
     @SubscribeEvent
-    public void tick(RenderGuiOverlayEvent.Post event) {
+    public void tick(RenderGuiLayerEvent.Post event) {
         Player player = mc.player;
         if (player != null) {
             IBleeding revive = PlayerReviveServer.getBleeding(player);
@@ -175,11 +171,11 @@ public class ReviveEventClient {
                 
                 if (!lastShader) {
                     if (PlayerRevive.CONFIG.bleeding.hasShaderEffect)
-                        mc.gameRenderer.loadEffect(new ResourceLocation("shaders/post/blobs2.json"));
+                        mc.gameRenderer.loadEffect(BLUR_SHADER);
                     lastShader = true;
-                } else if (PlayerRevive.CONFIG.bleeding.hasShaderEffect && (mc.gameRenderer.currentEffect() == null || !mc.gameRenderer.currentEffect().getName().equals(
-                    "minecraft:shaders/post/blobs2.json"))) {
-                    mc.gameRenderer.loadEffect(new ResourceLocation("shaders/post/blobs2.json"));
+                } else if (PlayerRevive.CONFIG.bleeding.hasShaderEffect && (mc.gameRenderer.currentEffect() == null || !mc.gameRenderer.currentEffect().getName().equals(BLUR_SHADER
+                        .toString()))) {
+                    mc.gameRenderer.loadEffect(BLUR_SHADER);
                 }
                 
                 if (!mc.options.hideGui && mc.screen == null) {

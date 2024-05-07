@@ -4,6 +4,9 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import org.jetbrains.annotations.UnknownNullability;
+
+import net.minecraft.core.HolderLookup.Provider;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
@@ -83,7 +86,7 @@ public class Bleeding implements IBleeding {
     }
     
     @Override
-    public CompoundTag serializeNBT() {
+    public @UnknownNullability CompoundTag serializeNBT(Provider provider) {
         CompoundTag nbt = new CompoundTag();
         nbt.putInt("timeLeft", timeLeft);
         nbt.putFloat("progress", progress);
@@ -93,7 +96,7 @@ public class Bleeding implements IBleeding {
     }
     
     @Override
-    public void deserializeNBT(CompoundTag nbt) {
+    public void deserializeNBT(Provider provider, CompoundTag nbt) {
         timeLeft = nbt.getInt("timeLeft");
         progress = nbt.getFloat("progress");
         bleeding = nbt.getBoolean("bleeding");

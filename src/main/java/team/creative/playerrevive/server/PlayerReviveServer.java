@@ -15,6 +15,7 @@ import team.creative.playerrevive.api.CombatTrackerClone;
 import team.creative.playerrevive.api.IBleeding;
 import team.creative.playerrevive.api.event.PlayerBleedOutEvent;
 import team.creative.playerrevive.api.event.PlayerRevivedEvent;
+import team.creative.playerrevive.cap.Bleeding;
 import team.creative.playerrevive.packet.HelperPacket;
 import team.creative.playerrevive.packet.ReviveUpdatePacket;
 
@@ -33,7 +34,11 @@ public class PlayerReviveServer {
     }
     
     public static IBleeding getBleeding(Player player) {
-        return player.getCapability(PlayerRevive.BLEEDING);
+        if (player.hasData(PlayerRevive.BLEEDING))
+            return player.getData(PlayerRevive.BLEEDING);
+        Bleeding bleeding = new Bleeding();
+        player.setData(PlayerRevive.BLEEDING, bleeding);
+        return bleeding;
     }
     
     public static void sendUpdatePacket(Player player) {

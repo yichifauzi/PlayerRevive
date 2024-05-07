@@ -91,6 +91,9 @@ public class PlayerReviveConfig {
         public boolean hasShaderEffect = true;
         
         @CreativeConfig
+        public double blurRadius = 4;
+        
+        @CreativeConfig
         public boolean changePermissionLevel = false;
         
         @CreativeConfig

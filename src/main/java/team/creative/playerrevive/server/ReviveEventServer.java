@@ -11,13 +11,11 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.neoforged.bus.api.EventPriority;
 import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.LogicalSide;
-import net.neoforged.neoforge.event.TickEvent.Phase;
-import net.neoforged.neoforge.event.TickEvent.PlayerTickEvent;
 import net.neoforged.neoforge.event.entity.living.LivingDeathEvent;
 import net.neoforged.neoforge.event.entity.living.LivingHurtEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent.PlayerLoggedOutEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
+import net.neoforged.neoforge.event.tick.PlayerTickEvent;
 import team.creative.creativecore.common.config.premade.MobEffectConfig;
 import team.creative.playerrevive.PlayerRevive;
 import team.creative.playerrevive.api.IBleeding;
@@ -32,9 +30,9 @@ public class ReviveEventServer {
     }
     
     @SubscribeEvent
-    public void playerTick(PlayerTickEvent event) {
-        if (event.phase == Phase.START && event.side == LogicalSide.SERVER && isReviveActive(event.player)) {
-            Player player = event.player;
+    public void playerTick(PlayerTickEvent.Pre event) {
+        if (!event.getEntity().level().isClientSide && isReviveActive(event.getEntity())) {
+            Player player = event.getEntity();
             if (!player.isAlive())
                 return;
             IBleeding revive = PlayerReviveServer.getBleeding(player);
