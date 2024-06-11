@@ -2,7 +2,6 @@ package team.creative.playerrevive.api;
 
 import java.util.List;
 
-import net.minecraft.core.RegistryAccess;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.player.Player;
@@ -32,7 +31,7 @@ public interface IBleeding extends INBTSerializable<CompoundTag> {
     
     public List<Player> revivingPlayers();
     
-    public DamageSource getSource(RegistryAccess access);
+    public DamageSource getSource();
     
     public CombatTrackerClone getTrackerClone();
     
