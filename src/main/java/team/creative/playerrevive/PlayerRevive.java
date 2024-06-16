@@ -17,10 +17,10 @@ import net.minecraft.world.damagesource.DamageType;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 import net.neoforged.bus.api.IEventBus;
-import net.neoforged.fml.DistExecutor;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
+import net.neoforged.fml.loading.FMLLoader;
 import net.neoforged.neoforge.attachment.AttachmentType;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.server.ServerStartingEvent;
@@ -44,13 +44,13 @@ public class PlayerRevive {
     public static final Logger LOGGER = LogManager.getLogger(PlayerRevive.MODID);
     public static final String MODID = "playerrevive";
     public static PlayerReviveConfig CONFIG;
-    public static final CreativeNetwork NETWORK = new CreativeNetwork(1, LOGGER, new ResourceLocation(PlayerRevive.MODID, "main"));
+    public static final CreativeNetwork NETWORK = new CreativeNetwork(1, LOGGER, ResourceLocation.tryBuild(PlayerRevive.MODID, "main"));
     
-    public static final ResourceLocation BLEEDING_NAME = new ResourceLocation(MODID, "bleeding");
-    public static final ResourceKey<DamageType> BLED_TO_DEATH = ResourceKey.create(Registries.DAMAGE_TYPE, new ResourceLocation(MODID, "bled_to_death"));
+    public static final ResourceLocation BLEEDING_NAME = ResourceLocation.tryBuild(MODID, "bleeding");
+    public static final ResourceKey<DamageType> BLED_TO_DEATH = ResourceKey.create(Registries.DAMAGE_TYPE, ResourceLocation.tryBuild(MODID, "bled_to_death"));
     
-    public static final SoundEvent DEATH_SOUND = SoundEvent.createVariableRangeEvent(new ResourceLocation(MODID, "death"));
-    public static final SoundEvent REVIVED_SOUND = SoundEvent.createVariableRangeEvent(new ResourceLocation(MODID, "revived"));
+    public static final SoundEvent DEATH_SOUND = SoundEvent.createVariableRangeEvent(ResourceLocation.tryBuild(MODID, "death"));
+    public static final SoundEvent REVIVED_SOUND = SoundEvent.createVariableRangeEvent(ResourceLocation.tryBuild(MODID, "revived"));
     
     private static final DeferredRegister<AttachmentType<?>> ATTACHMENT_TYPES = DeferredRegister.create(NeoForgeRegistries.Keys.ATTACHMENT_TYPES, MODID);
     
@@ -59,13 +59,14 @@ public class PlayerRevive {
     
     public void register(RegisterEvent event) {
         event.register(Registries.SOUND_EVENT, x -> {
-            x.register(new ResourceLocation(MODID, "death"), DEATH_SOUND);
-            x.register(new ResourceLocation(MODID, "revived"), REVIVED_SOUND);
+            x.register(ResourceLocation.tryBuild(MODID, "death"), DEATH_SOUND);
+            x.register(ResourceLocation.tryBuild(MODID, "revived"), REVIVED_SOUND);
         });
     }
     
     public PlayerRevive(IEventBus bus) {
-        DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> bus.addListener(this::client));
+        if (FMLLoader.getDist() == Dist.CLIENT)
+            bus.addListener(this::client);
         bus.addListener(this::init);
         bus.addListener(this::register);
         NeoForge.EVENT_BUS.addListener(this::serverStarting);

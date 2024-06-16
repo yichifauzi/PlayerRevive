@@ -33,7 +33,7 @@ import team.creative.playerrevive.server.PlayerReviveServer;
 @OnlyIn(value = Dist.CLIENT)
 public class ReviveEventClient {
     
-    private static final ResourceLocation BLUR_SHADER = new ResourceLocation(PlayerRevive.MODID, "shaders/post/blobs2.json");
+    private static final ResourceLocation BLUR_SHADER = ResourceLocation.tryBuild(PlayerRevive.MODID, "shaders/post/blobs2.json");
     public static Minecraft mc = Minecraft.getInstance();
     
     public static TensionSound sound;
@@ -152,7 +152,7 @@ public class ReviveEventClient {
                     if (!lastHighTension) {
                         if (!PlayerRevive.CONFIG.disableMusic) {
                             mc.getSoundManager().stop(sound);
-                            sound = new TensionSound(new ResourceLocation(PlayerRevive.MODID, "hightension"), PlayerRevive.CONFIG.countdownMusicVolume, 1.0F, false);
+                            sound = new TensionSound(ResourceLocation.tryBuild(PlayerRevive.MODID, "hightension"), PlayerRevive.CONFIG.countdownMusicVolume, 1.0F, false);
                             mc.getSoundManager().play(sound);
                         }
                         lastHighTension = true;
@@ -163,7 +163,7 @@ public class ReviveEventClient {
                         if (sound != null)
                             mc.getSoundManager().stop(sound);
                         if (!PlayerRevive.CONFIG.disableMusic) {
-                            sound = new TensionSound(new ResourceLocation(PlayerRevive.MODID, "tension"), PlayerRevive.CONFIG.bleedingMusicVolume, 1.0F, true);
+                            sound = new TensionSound(ResourceLocation.tryBuild(PlayerRevive.MODID, "tension"), PlayerRevive.CONFIG.bleedingMusicVolume, 1.0F, true);
                             mc.getSoundManager().play(sound);
                         }
                     }
