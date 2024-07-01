@@ -1,3 +1,6 @@
+2.0.26
+Updated to neoforge 21.0.45-beta
+
 2.0.25
 Fixed player not getting killed when bleeding after leaving the game (compatibility issue with TheAether)
 Potential fix for using interactions from other mods while bleeding
