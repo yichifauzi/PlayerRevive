@@ -4,6 +4,7 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
@@ -101,14 +102,24 @@ public class ReviveEventServer {
         }
     }
     
+    private boolean doesByPass(Player player, DamageSource source) {
+        var registry = player.level().registryAccess().registryOrThrow(Registries.DAMAGE_TYPE);
+        if (source.type() == registry.getOrThrow(PlayerRevive.BLED_TO_DEATH))
+            return true;
+        if (PlayerRevive.CONFIG.bypassDamageSources.contains(source.getMsgId()))
+            return true;
+        if (PlayerRevive.CONFIG.bypassDamageSources.contains(source.typeHolder().getRegisteredName()))
+            return true;
+        return false;
+    }
+    
     @SubscribeEvent
     public void playerDamage(LivingIncomingDamageEvent event) {
         if (event.getEntity() instanceof Player) {
             Player player = (Player) event.getEntity();
             IBleeding revive = PlayerReviveServer.getBleeding(player);
             if (revive.isBleeding()) {
-                if (event.getSource().type() == player.level().registryAccess().registryOrThrow(Registries.DAMAGE_TYPE).getOrThrow(
-                    PlayerRevive.BLED_TO_DEATH) || PlayerRevive.CONFIG.bypassDamageSources.contains(event.getSource().getMsgId()))
+                if (doesByPass(player, event.getSource()))
                     return;
                 
                 if (revive.bledOut())
@@ -134,8 +145,7 @@ public class ReviveEventServer {
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     public void playerDied(LivingDeathEvent event) {
         if (event.getEntity() instanceof Player player && isReviveActive(event.getEntity()) && !event.getEntity().level().isClientSide) {
-            if (event.getSource().type() != player.level().registryAccess().registryOrThrow(Registries.DAMAGE_TYPE).getOrThrow(
-                PlayerRevive.BLED_TO_DEATH) && !PlayerRevive.CONFIG.bypassDamageSources.contains(event.getSource().getMsgId())) {
+            if (!doesByPass(player, event.getSource())) {
                 IBleeding revive = PlayerReviveServer.getBleeding(player);
                 
                 if (revive.bledOut() || revive.isBleeding()) {
