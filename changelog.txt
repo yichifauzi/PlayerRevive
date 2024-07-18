@@ -1,3 +1,8 @@
+2.0.27
+Added enableBypassDamage, bypassDamage and bypassSourceByDamage to allow configuration to bypass bleeding when taking large amounts of damage (by default it is disabled)
+Added hordes:infection to bypass bleeding by default
+Fixed bypassDamageSources not respecting registry key
+
 2.0.26
 Updated to neoforge 21.0.45-beta
 
