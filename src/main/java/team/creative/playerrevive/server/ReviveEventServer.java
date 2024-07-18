@@ -1,6 +1,5 @@
 package team.creative.playerrevive.server;
 
-import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundSource;
@@ -12,6 +11,7 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.neoforged.bus.api.EventPriority;
 import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.neoforge.event.entity.living.LivingDamageEvent;
 import net.neoforged.neoforge.event.entity.living.LivingDeathEvent;
 import net.neoforged.neoforge.event.entity.living.LivingIncomingDamageEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent.PlayerLoggedOutEvent;
@@ -19,7 +19,9 @@ import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
 import net.neoforged.neoforge.event.tick.PlayerTickEvent;
 import team.creative.creativecore.common.config.premade.MobEffectConfig;
 import team.creative.playerrevive.PlayerRevive;
+import team.creative.playerrevive.PlayerReviveConfig.DamageTypeConfig;
 import team.creative.playerrevive.api.IBleeding;
+import team.creative.playerrevive.api.PlayerExtender;
 import team.creative.playerrevive.packet.HelperPacket;
 
 public class ReviveEventServer {
@@ -103,13 +105,28 @@ public class ReviveEventServer {
     }
     
     private boolean doesByPass(Player player, DamageSource source) {
-        var registry = player.level().registryAccess().registryOrThrow(Registries.DAMAGE_TYPE);
-        if (source.type() == registry.getOrThrow(PlayerRevive.BLED_TO_DEATH))
+        if (source.typeHolder().is(PlayerRevive.BLED_TO_DEATH))
             return true;
         if (PlayerRevive.CONFIG.bypassDamageSources.contains(source.getMsgId()))
             return true;
         if (PlayerRevive.CONFIG.bypassDamageSources.contains(source.typeHolder().getRegisteredName()))
             return true;
+        
+        return false;
+    }
+    
+    private boolean doesByPassDamageAmount(Player player, DamageSource source) {
+        if (!PlayerRevive.CONFIG.enableBypassDamage)
+            return false;
+        var amount = ((PlayerExtender) player).getOverkill();
+        if (PlayerRevive.CONFIG.bypassDamage <= amount)
+            return true;
+        for (DamageTypeConfig d : PlayerRevive.CONFIG.bypassSourceByDamage) {
+            if (d.damageAmount > amount)
+                continue;
+            if (d.damageType.equals(source.getMsgId()) || d.damageType.equals(source.typeHolder().getRegisteredName()))
+                return true;
+        }
         return false;
     }
     
@@ -142,10 +159,16 @@ public class ReviveEventServer {
         }
     }
     
+    @SubscribeEvent(priority = EventPriority.LOWEST)
+    public void playerOverkillTracker(LivingDamageEvent.Pre event) {
+        if (!event.getEntity().level().isClientSide && event.getEntity() instanceof PlayerExtender player && isReviveActive(event.getEntity()))
+            player.setOverkill(Math.max(0, event.getContainer().getNewDamage() - event.getEntity().getHealth()));
+    }
+    
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     public void playerDied(LivingDeathEvent event) {
-        if (event.getEntity() instanceof Player player && isReviveActive(event.getEntity()) && !event.getEntity().level().isClientSide) {
-            if (!doesByPass(player, event.getSource())) {
+        if (!event.getEntity().level().isClientSide && event.getEntity() instanceof Player player && isReviveActive(event.getEntity())) {
+            if (!doesByPass(player, event.getSource()) && !doesByPassDamageAmount(player, event.getSource())) {
                 IBleeding revive = PlayerReviveServer.getBleeding(player);
                 
                 if (revive.bledOut() || revive.isBleeding()) {

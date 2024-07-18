@@ -1,5 +1,6 @@
 package team.creative.playerrevive;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -7,6 +8,7 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Items;
 import team.creative.creativecore.common.config.api.CreativeConfig;
+import team.creative.creativecore.common.config.converation.ConfigTypeConveration;
 import team.creative.creativecore.common.config.premade.MobEffectConfig;
 import team.creative.creativecore.common.config.premade.SoundConfig;
 import team.creative.creativecore.common.config.sync.ConfigSynchronization;
@@ -14,6 +16,10 @@ import team.creative.creativecore.common.util.ingredient.CreativeIngredient;
 import team.creative.creativecore.common.util.ingredient.CreativeIngredientItem;
 
 public class PlayerReviveConfig {
+    
+    static {
+        ConfigTypeConveration.registerTypeCreator(DamageTypeConfig.class, () -> new DamageTypeConfig("", 0));
+    }
     
     @CreativeConfig(type = ConfigSynchronization.CLIENT)
     public boolean disableMusic = true;
@@ -40,6 +46,15 @@ public class PlayerReviveConfig {
     
     @CreativeConfig
     public List<String> bypassDamageSources = Arrays.asList("gorgon", "death.attack.sgcraft:transient", "death.attack.sgcraft:iris", "vampirism_dbno", "hordes:infection");
+    
+    @CreativeConfig
+    public boolean enableBypassDamage;
+    
+    @CreativeConfig
+    public int bypassDamage = 10;
+    
+    @CreativeConfig
+    public List<DamageTypeConfig> bypassSourceByDamage = new ArrayList<>();
     
     @CreativeConfig
     public boolean bleedInSingleplayer = false;
@@ -147,6 +162,21 @@ public class PlayerReviveConfig {
         public SoundConfig death = new SoundConfig(ResourceLocation.tryBuild(PlayerRevive.MODID, "death"));
         @CreativeConfig
         public SoundConfig revived = new SoundConfig(ResourceLocation.tryBuild(PlayerRevive.MODID, "revived"));
+        
+    }
+    
+    public static class DamageTypeConfig {
+        
+        @CreativeConfig
+        public String damageType;
+        
+        @CreativeConfig
+        public int damageAmount;
+        
+        public DamageTypeConfig(String damageType, int damageAmount) {
+            this.damageType = damageType;
+            this.damageAmount = damageAmount;
+        }
         
     }
     
