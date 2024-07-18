@@ -116,7 +116,7 @@ public class ReviveEventServer {
             return true;
         if (PlayerRevive.CONFIG.bypassDamageSources.contains(source.getMsgId()))
             return true;
-        if (PlayerRevive.CONFIG.bypassDamageSources.contains(source.typeHolder().getRegisteredName()))
+        if (PlayerRevive.CONFIG.bypassDamageSources.contains(source.typeHolder().unwrapKey().get().location().toString()))
             return true;
         return false;
     }
