@@ -20,7 +20,7 @@ import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityManager;
 import net.minecraftforge.common.capabilities.CapabilityToken;
 import net.minecraftforge.common.capabilities.RegisterCapabilitiesEvent;
-import net.minecraftforge.event.server.ServerStartingEvent;
+import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
@@ -89,15 +89,14 @@ public class PlayerRevive {
         event.register(IBleeding.class);
     }
     
-    private void serverStarting(final ServerStartingEvent event) {
-        event.getServer().getCommands().getDispatcher().register(Commands.literal("revive").requires(x -> x.hasPermission(2)).then(Commands.argument("players", EntityArgument
-                .players()).executes(x -> {
-                    Collection<ServerPlayer> players = EntityArgument.getPlayers(x, "players");
-                    for (ServerPlayer player : players)
-                        if (PlayerReviveServer.getBleeding(player).isBleeding())
-                            PlayerReviveServer.revive(player);
-                    return 0;
-                })));
+    private void serverStarting(final RegisterCommandsEvent event) {
+        event.getDispatcher().register(Commands.literal("revive").requires(x -> x.hasPermission(2)).then(Commands.argument("players", EntityArgument.players()).executes(x -> {
+            Collection<ServerPlayer> players = EntityArgument.getPlayers(x, "players");
+            for (ServerPlayer player : players)
+                if (PlayerReviveServer.getBleeding(player).isBleeding())
+                    PlayerReviveServer.revive(player);
+            return 0;
+        })));
     }
     
 }
