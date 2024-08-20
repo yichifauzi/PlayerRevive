@@ -1,3 +1,6 @@
+2.0.28
+Fixed commands being gone after using reload
+
 2.0.27
 Fixed commands being gone after using reload
 
