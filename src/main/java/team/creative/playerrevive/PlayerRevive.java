@@ -23,7 +23,7 @@ import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.neoforged.fml.loading.FMLLoader;
 import net.neoforged.neoforge.attachment.AttachmentType;
 import net.neoforged.neoforge.common.NeoForge;
-import net.neoforged.neoforge.event.server.ServerStartingEvent;
+import net.neoforged.neoforge.event.RegisterCommandsEvent;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import net.neoforged.neoforge.registries.NeoForgeRegistries;
 import net.neoforged.neoforge.registries.RegisterEvent;
@@ -88,15 +88,14 @@ public class PlayerRevive {
         NeoForge.EVENT_BUS.register(new ReviveEventServer());
     }
     
-    private void serverStarting(final ServerStartingEvent event) {
-        event.getServer().getCommands().getDispatcher().register(Commands.literal("revive").requires(x -> x.hasPermission(2)).then(Commands.argument("players", EntityArgument
-                .players()).executes(x -> {
-                    Collection<ServerPlayer> players = EntityArgument.getPlayers(x, "players");
-                    for (ServerPlayer player : players)
-                        if (PlayerReviveServer.getBleeding(player).isBleeding())
-                            PlayerReviveServer.revive(player);
-                    return 0;
-                })));
+    private void serverStarting(final RegisterCommandsEvent event) {
+        event.getDispatcher().register(Commands.literal("revive").requires(x -> x.hasPermission(2)).then(Commands.argument("players", EntityArgument.players()).executes(x -> {
+            Collection<ServerPlayer> players = EntityArgument.getPlayers(x, "players");
+            for (ServerPlayer player : players)
+                if (PlayerReviveServer.getBleeding(player).isBleeding())
+                    PlayerReviveServer.revive(player);
+            return 0;
+        })));
     }
     
 }
