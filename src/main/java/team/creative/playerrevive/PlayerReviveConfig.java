@@ -72,6 +72,7 @@ public class PlayerReviveConfig {
         
         @CreativeConfig
         public boolean bleedingMessage = true;
+        
         @CreativeConfig
         public boolean bleedingMessageTrackingOnly = true;
         
