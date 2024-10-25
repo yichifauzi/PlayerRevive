@@ -1,6 +1,8 @@
 package team.creative.playerrevive.server;
 
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.protocol.game.ClientboundSystemChatPacket;
+import net.minecraft.server.level.ServerChunkCache;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.damagesource.DamageSource;
@@ -195,10 +197,11 @@ public class ReviveEventServer {
                 player.setHealth(PlayerRevive.CONFIG.bleeding.bleedingHealth);
                 
                 if (PlayerRevive.CONFIG.bleeding.bleedingMessage)
-                    if (PlayerRevive.CONFIG.bleeding.bleedingMessageTrackingOnly)
-                        player.getServer().getPlayerList().broadcastSystemMessage(Component.translatable("playerrevive.chat.bleeding", player.getDisplayName(), player
-                                .getCombatTracker().getDeathMessage()), false);
-                    else
+                    if (PlayerRevive.CONFIG.bleeding.bleedingMessageTrackingOnly) {
+                        if (player.level().getChunkSource() instanceof ServerChunkCache chunkCache)
+                            chunkCache.broadcastAndSend(player, new ClientboundSystemChatPacket(Component.translatable("playerrevive.chat.bleeding", player.getDisplayName(), player
+                                    .getCombatTracker().getDeathMessage()), false));
+                    } else
                         player.getServer().getPlayerList().broadcastSystemMessage(Component.translatable("playerrevive.chat.bleeding", player.getDisplayName(), player
                                 .getCombatTracker().getDeathMessage()), false);
             }
