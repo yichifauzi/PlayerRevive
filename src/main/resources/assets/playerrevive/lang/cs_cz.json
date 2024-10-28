@@ -1,7 +1,5 @@
 {
-	"playerrevive.chat.bleeding": "%s krvácí...",
-	"death.attack.bledToDeath.player": "%s vykrvácel",
-	"playerrevive.gui.button.send": "poslat",
-	"playerrevive.gui.label.time_left": "Zbývající čas %s",
-	"playerrevive.gui.hold": "Drž '%s' po dobu %s sekund"
+  "playerrevive.chat.bleeding": "%s krvácí...",
+  "playerrevive.gui.label.time_left": "Zbývající čas: %s",
+  "playerrevive.gui.hold": "Drž '%s' po dobu %s sekund"
 }
