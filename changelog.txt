@@ -1,3 +1,6 @@
+2.0.29
+Improved translations and cleaned up their files (Greg-21)
+
 2.0.28
 Fixed commands being gone after using reload
 
