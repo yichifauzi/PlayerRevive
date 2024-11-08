@@ -148,7 +148,7 @@ public class Bleeding implements IBleeding {
     public DamageSource getSource(RegistryAccess access) {
         if (lastSource != null)
             return lastSource;
-        return new DamageSource(access.registryOrThrow(Registries.DAMAGE_TYPE).getHolderOrThrow(PlayerRevive.BLED_TO_DEATH));
+        return new DamageSource(access.lookupOrThrow(Registries.DAMAGE_TYPE).getOrThrow(PlayerRevive.BLED_TO_DEATH));
     }
     
     @Override

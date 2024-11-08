@@ -8,7 +8,7 @@ import com.mojang.blaze3d.systems.RenderSystem;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.renderer.GameRenderer;
+import net.minecraft.client.renderer.CoreShaders;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.effect.MobEffectInstance;
@@ -49,7 +49,7 @@ public class ReviveEventClient {
             width = Math.max(width, mc.font.width(text) + 10);
         }
         
-        RenderSystem.setShader(GameRenderer::getPositionTexShader);
+        RenderSystem.setShader(CoreShaders.POSITION_TEX);
         RenderSystem.defaultBlendFunc();
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
         RenderSystem.disableDepthTest();
@@ -171,11 +171,11 @@ public class ReviveEventClient {
                 
                 if (!lastShader) {
                     if (PlayerRevive.CONFIG.bleeding.hasShaderEffect)
-                        mc.gameRenderer.loadEffect(BLUR_SHADER);
+                        mc.gameRenderer.setPostEffect(BLUR_SHADER);
                     lastShader = true;
-                } else if (PlayerRevive.CONFIG.bleeding.hasShaderEffect && (mc.gameRenderer.currentEffect() == null || !mc.gameRenderer.currentEffect().getName().equals(BLUR_SHADER
-                        .toString()))) {
-                    mc.gameRenderer.loadEffect(BLUR_SHADER);
+                } else if (PlayerRevive.CONFIG.bleeding.hasShaderEffect && (mc.gameRenderer.currentPostEffect() == null || !mc.gameRenderer.currentPostEffect().equals(
+                    BLUR_SHADER))) {
+                    mc.gameRenderer.setPostEffect(BLUR_SHADER);
                 }
                 
                 if (!mc.options.hideGui && mc.screen == null) {

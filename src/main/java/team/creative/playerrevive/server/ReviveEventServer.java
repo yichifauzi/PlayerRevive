@@ -84,7 +84,7 @@ public class ReviveEventServer {
                 event.setCanceled(true);
                 if (PlayerRevive.CONFIG.revive.needReviveItem) {
                     if (PlayerRevive.CONFIG.revive.consumeReviveItem && !revive.isItemConsumed()) {
-                        if (PlayerRevive.CONFIG.revive.reviveItem.is(helper.getMainHandItem())) {
+                        if (PlayerRevive.CONFIG.revive.reviveItem.is(event.getLevel(), helper.getMainHandItem())) {
                             if (!helper.isCreative()) {
                                 helper.getMainHandItem().shrink(1);
                                 helper.getInventory().setChanged();
@@ -92,10 +92,10 @@ public class ReviveEventServer {
                             revive.setItemConsumed();
                         } else {
                             if (!helper.level().isClientSide)
-                                helper.sendSystemMessage(Component.translatable("playerrevive.revive.item", PlayerRevive.CONFIG.revive.reviveItem.description()));
+                                helper.displayClientMessage(Component.translatable("playerrevive.revive.item", PlayerRevive.CONFIG.revive.reviveItem.description()), false);
                             return;
                         }
-                    } else if (!PlayerRevive.CONFIG.revive.reviveItem.is(helper.getMainHandItem()))
+                    } else if (!PlayerRevive.CONFIG.revive.reviveItem.is(event.getLevel(), helper.getMainHandItem()))
                         return;
                 }
                 
@@ -200,7 +200,8 @@ public class ReviveEventServer {
                 if (PlayerRevive.CONFIG.bleeding.bleedingMessage)
                     if (PlayerRevive.CONFIG.bleeding.bleedingMessageTrackingOnly) {
                         if (player.level().getChunkSource() instanceof ServerChunkCache chunkCache)
-                            chunkCache.broadcastAndSend(player, new ClientboundSystemChatPacket(Component.translatable("playerrevive.chat.bleeding", player.getDisplayName()), false));
+                            chunkCache.broadcastAndSend(player, new ClientboundSystemChatPacket(Component.translatable("playerrevive.chat.bleeding", player
+                                    .getDisplayName()), false));
                     } else
                         player.getServer().getPlayerList().broadcastSystemMessage(Component.translatable("playerrevive.chat.bleeding", player.getDisplayName()), false);
             }
